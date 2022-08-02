@@ -45,6 +45,7 @@ const navigationItems = [
 ];
 
 export default function HomeLayout({ children, title, others }: any) {
+  const router = useRouter();
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -83,7 +84,9 @@ export default function HomeLayout({ children, title, others }: any) {
                     : { padding: "5px" }
                 }
               >
-                <ListItemButton>
+                <ListItemButton
+                  onClick={() => router.push(`/${item.label.toLowerCase()}`)}
+                >
                   <ListItemIcon
                     style={
                       title == item.label

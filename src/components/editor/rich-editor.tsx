@@ -1,12 +1,13 @@
-import React, { useCallback, useMemo } from "react";
+import React, { ReactNode, useCallback, useMemo, useState } from "react";
 import isHotkey from "is-hotkey";
-import { Editable, withReact, useSlate, Slate } from "slate-react";
+import { Editable, withReact, useSlate, Slate, ReactEditor } from "slate-react";
 import {
   Editor,
   Transforms,
   createEditor,
   Descendant,
   Element as SlateElement,
+  BaseEditor,
 } from "slate";
 import { withHistory } from "slate-history";
 
@@ -27,7 +28,11 @@ import {
   LooksTwo,
 } from "@mui/icons-material";
 
-const HOTKEYS = {
+import { Button as MuiButton } from "@mui/material";
+import { useMutation } from "@tanstack/react-query";
+import { updatePage } from "../../api";
+
+const HOTKEYS: { [key: string]: string } = {
   "mod+b": "bold",
   "mod+i": "italic",
   "mod+u": "underline",
@@ -37,13 +42,60 @@ const HOTKEYS = {
 const LIST_TYPES = ["numbered-list", "bulleted-list"];
 const TEXT_ALIGN_TYPES = ["left", "center", "right", "justify"];
 
-const RichTextExample = () => {
-  const renderElement = useCallback((props) => <Element {...props} />, []);
-  const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
-  const editor = useMemo(() => withHistory(withReact(createEditor())), []);
+const RichTextExample = ({ content, pageId }: any) => {
+  console.log(content);
+  const renderElement = useCallback((props: any) => <Element {...props} />, []);
+  const renderLeaf = useCallback((props: any) => <Leaf {...props} />, []);
+
+  const [slateValue, setSlateValue] = React.useState<any>(content);
+  const [editor] = useState(
+    withReact<ReactEditor>(createEditor() as ReactEditor)
+  );
+  const updatePageMutation = useMutation(
+    ["update-page"],
+    () => updatePage(pageId, { content: JSON.stringify(slateValue) }),
+    {
+      onSuccess: (data) => {
+        console.log("page update sucess", data);
+      },
+      onError: () => {},
+    }
+  );
+
+  React.useEffect(() => {
+    Transforms.delete(editor, {
+      at: {
+        anchor: Editor.start(editor, []),
+        focus: Editor.end(editor, []),
+      },
+    });
+    Transforms.insertNodes(editor, content, {
+      at: {
+        anchor: Editor.start(editor, []),
+        focus: Editor.start(editor, []),
+      },
+    });
+  }, [content]);
+
+  const handleSave = () => {
+    console.log("saving this", JSON.stringify(slateValue));
+    updatePageMutation.mutate();
+  };
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate
+      editor={editor}
+      value={slateValue}
+      onChange={(value) => {
+        const isAstChange = editor.operations.some(
+          (op) => "set_selection" !== op.type
+        );
+        if (isAstChange) {
+          console.log("gds");
+          setSlateValue(value);
+        }
+      }}
+    >
       <Toolbar>
         <MarkButton format="bold" Icon={<FormatBoldIcon />} />
         <MarkButton format="italic" Icon={<FormatItalicIcon />} />
@@ -58,6 +110,7 @@ const RichTextExample = () => {
         <BlockButton format="center" Icon={<FormatAlignCenter />} />
         <BlockButton format="right" Icon={<FormatAlignRight />} />
         <BlockButton format="justify" Icon={<FormatAlignJustify />} />
+        <MuiButton onClick={handleSave}>Save</MuiButton>
       </Toolbar>
       <Editable
         renderElement={renderElement}
@@ -74,12 +127,17 @@ const RichTextExample = () => {
             }
           }
         }}
+        style={{
+          overflowY: "scroll",
+          height: "90%",
+          margin: "0px",
+        }}
       />
     </Slate>
   );
 };
 
-const toggleBlock = (editor, format) => {
+const toggleBlock = (editor: BaseEditor, format: string) => {
   const isActive = isBlockActive(
     editor,
     format,
@@ -88,14 +146,14 @@ const toggleBlock = (editor, format) => {
   const isList = LIST_TYPES.includes(format);
 
   Transforms.unwrapNodes(editor, {
-    match: (n) =>
+    match: (n: any) =>
       !Editor.isEditor(n) &&
+      LIST_TYPES.includes(n?.type) &&
       SlateElement.isElement(n) &&
-      LIST_TYPES.includes(n.type) &&
       !TEXT_ALIGN_TYPES.includes(format),
     split: true,
   });
-  let newProperties: Partial<SlateElement>;
+  let newProperties: any;
   if (TEXT_ALIGN_TYPES.includes(format)) {
     newProperties = {
       align: isActive ? undefined : format,
@@ -113,7 +171,7 @@ const toggleBlock = (editor, format) => {
   }
 };
 
-const toggleMark = (editor, format) => {
+const toggleMark = (editor: BaseEditor, format: string) => {
   const isActive = isMarkActive(editor, format);
 
   if (isActive) {
@@ -123,29 +181,33 @@ const toggleMark = (editor, format) => {
   }
 };
 
-const isBlockActive = (editor, format, blockType = "type") => {
+const isBlockActive = (
+  editor: BaseEditor,
+  format: string,
+  blockType = "type"
+) => {
   const { selection } = editor;
   if (!selection) return false;
 
   const [match] = Array.from(
     Editor.nodes(editor, {
       at: Editor.unhangRange(editor, selection),
-      match: (n) =>
+      match: (n: any) =>
         !Editor.isEditor(n) &&
-        SlateElement.isElement(n) &&
-        n[blockType] === format,
+        n[blockType] === format &&
+        SlateElement.isElement(n),
     })
   );
 
   return !!match;
 };
 
-const isMarkActive = (editor, format) => {
-  const marks = Editor.marks(editor);
+const isMarkActive = (editor: BaseEditor, format: string) => {
+  const marks: any = Editor.marks(editor);
   return marks ? marks[format] === true : false;
 };
 
-const Element = ({ attributes, children, element }) => {
+const Element = ({ attributes, children, element }: any) => {
   const style = { textAlign: element.align };
   switch (element.type) {
     case "block-quote":
@@ -193,7 +255,7 @@ const Element = ({ attributes, children, element }) => {
   }
 };
 
-const Leaf = ({ attributes, children, leaf }) => {
+const Leaf = ({ attributes, children, leaf }: any) => {
   if (leaf.bold) {
     children = <strong>{children}</strong>;
   }
@@ -213,7 +275,7 @@ const Leaf = ({ attributes, children, leaf }) => {
   return <span {...attributes}>{children}</span>;
 };
 
-const BlockButton = ({ format, Icon }) => {
+const BlockButton = ({ format, Icon }: { format: string; Icon: ReactNode }) => {
   const editor = useSlate();
   return (
     <Button
@@ -222,7 +284,7 @@ const BlockButton = ({ format, Icon }) => {
         format,
         TEXT_ALIGN_TYPES.includes(format) ? "align" : "type"
       )}
-      onMouseDown={(event) => {
+      onMouseDown={(event: any) => {
         event.preventDefault();
         toggleBlock(editor, format);
       }}
@@ -232,12 +294,12 @@ const BlockButton = ({ format, Icon }) => {
   );
 };
 
-const MarkButton = ({ format, Icon }) => {
+const MarkButton = ({ format, Icon }: { format: string; Icon: ReactNode }) => {
   const editor = useSlate();
   return (
     <Button
       active={isMarkActive(editor, format)}
-      onMouseDown={(event) => {
+      onMouseDown={(event: any) => {
         event.preventDefault();
         toggleMark(editor, format);
       }}

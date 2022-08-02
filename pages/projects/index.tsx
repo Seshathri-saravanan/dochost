@@ -1,3 +1,4 @@
+import React from "react";
 import type { NextPage } from "next";
 import HomeLayout from "../../src/components/layouts/home-layout";
 import { projects } from "../../src/mock-objects";
@@ -13,6 +14,10 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
+import { useQuery } from "@tanstack/react-query";
+import { getAllProjects } from "../../src/api";
+import Link from "next/link";
+import CreateProject from "../../src/components/projects/createProjeect";
 
 const ProjectCard = ({ project }: any) => (
   <Box sx={{ minWidth: 275 }}>
@@ -26,9 +31,6 @@ const ProjectCard = ({ project }: any) => (
       <CardContent>
         <Typography variant="h6" component="div" color={"white"}>
           {project.name}
-        </Typography>
-        <Typography sx={{ mb: 1.5 }} color="white">
-          {project.description}
         </Typography>
         <div
           style={{
@@ -46,11 +48,7 @@ const ProjectCard = ({ project }: any) => (
               color: "black",
             }}
           >
-            <Typography variant="body2">
-              well meaning and kindly.
-              <br />
-              {'"a benevolent smile"'}
-            </Typography>
+            <Typography variant="body2">{project.description}</Typography>
           </div>
         </div>
         <div>
@@ -67,24 +65,37 @@ const ProjectCard = ({ project }: any) => (
         </div>
       </CardContent>
       <CardActions>
-        <Button
-          size="small"
+        <Link
           style={{ display: "block", margin: "10px", marginRight: "auto" }}
+          href={`/projects/${project.id}`}
         >
           View project
-        </Button>
+        </Link>
       </CardActions>
     </Card>
   </Box>
 );
 
 const Home: NextPage = () => {
+  const projectsQuery = useQuery(["get-all-projects"], getAllProjects, {
+    onSuccess: (data) => {
+      console.log("data-projects", data);
+    },
+    onError: (e) => {
+      console.log("error-projects", e);
+    },
+  });
+  if (projectsQuery && projectsQuery.isLoading) {
+    return <div>Loading the projects</div>;
+  }
+
   return (
     <HomeLayout title={"Projects"}>
       <div>
-        <div style={{ marginBottom: "40px" }}>
+        <Grid container style={{ marginBottom: "40px" }}>
           <Typography variant="h3">Projects</Typography>
-        </div>
+          <CreateProject />
+        </Grid>
         <Divider />
         <Typography variant="h5" style={{ margin: "10px" }}>
           Your projects
@@ -95,7 +106,7 @@ const Home: NextPage = () => {
           justifyContent="center"
           alignItems={"stretch"}
         >
-          {[...projects, ...projects, ...projects].map((project, ind) => (
+          {projectsQuery.data.map((project: any, ind: number) => (
             <Grid item xs={3}>
               <ProjectCard project={project} />
             </Grid>

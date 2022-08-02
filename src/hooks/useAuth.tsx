@@ -46,14 +46,13 @@ export const AuthProvider = (props: any) => {
     }
   }, []);
   const router = useRouter();
-  /*
   useEffect(() => {
-    console.log(user, loading);
-    if (!user && !loading) {
+    console.log(user, loading, router.pathname);
+    if (!user && !loading && router.pathname !== "/login") {
       router.push("/login");
-    } else router.push("/");
+    }
+    if (user && !loading && router.pathname == "/login") router.push("/");
   }, [user, loading]);
-  */
   return (
     <AuthContext.Provider value={{ user, logout, login, loading }} {...props} />
   );

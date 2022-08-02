@@ -20,34 +20,56 @@ import FolderCopyIcon from "@mui/icons-material/FolderCopy";
 import BusinessIcon from "@mui/icons-material/Business";
 import AcUnitIcon from "@mui/icons-material/AcUnit";
 import { project } from "../../src/mock-objects";
-import PlainTextExample from "../../src/components/editor/rich-editor";
+import TextEditor from "../../src/components/editor/rich-editor";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { createPage, getProjectDetails } from "../../src/api";
+import {
+  Button,
+  Dialog,
+  DialogTitle,
+  Grid,
+  Modal,
+  TextField,
+} from "@mui/material";
 const drawerWidth = 240;
-
-const navigationItems = [
-  {
-    label: "Recents",
-    icon: <AcUnitIcon />,
-  },
-  {
-    label: "Profile",
-    icon: <AccountBoxIcon />,
-  },
-  {
-    label: "Organisations",
-    icon: <BusinessIcon />,
-  },
-  {
-    label: "Projects",
-    icon: <FolderCopyIcon />,
-  },
-  {
-    label: "Project settings",
-    icon: <SettingsIcon />,
-  },
-];
 
 export default function HomeLayout({ children, title, others }: any) {
   const [selectedPage, setSelectedPage] = React.useState(0);
+  const [openCreatePage, setOpenCreatePage] = React.useState(false);
+  const [newPageName, setNewPageName] = React.useState<string>("");
+  const router = useRouter();
+  const { projectId } = router.query;
+  const projectDetailsQuery = useQuery(
+    ["get-project-details", projectId],
+    () => getProjectDetails(Number(projectId)),
+    {
+      onSuccess: (data) => {
+        console.log("this is data", data);
+      },
+      enabled: false,
+    }
+  );
+  const addPageMutation = useMutation(
+    ["add-page"],
+    () => createPage(Number(projectId), newPageName),
+    {
+      onSuccess: () => {
+        console.log("added page");
+        projectDetailsQuery.refetch();
+      },
+      onError: () => {},
+    }
+  );
+
+  React.useEffect(() => {
+    if (projectId) {
+      projectDetailsQuery.refetch();
+    }
+  }, [projectId]);
+  if (projectDetailsQuery.isLoading || !projectDetailsQuery.isFetched)
+    return <h1>Loading</h1>;
+  if (!projectDetailsQuery.data) return <h1>No data</h1>;
+  const project = projectDetailsQuery.data;
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -71,10 +93,10 @@ export default function HomeLayout({ children, title, others }: any) {
           {project.name}
         </Typography>
         <List style={{ margin: "5px" }}>
-          {project.pages.map((item, index) => (
+          {project.pages.map((item: any, index: number) => (
             <>
               <ListItem
-                key={item.name}
+                key={index}
                 style={
                   index === selectedPage
                     ? {
@@ -86,7 +108,7 @@ export default function HomeLayout({ children, title, others }: any) {
                     : { padding: "5px" }
                 }
               >
-                <ListItemButton>
+                <ListItemButton onClick={() => setSelectedPage(index)}>
                   <ListItemText
                     primary={item.name}
                     primaryTypographyProps={{
@@ -99,16 +121,66 @@ export default function HomeLayout({ children, title, others }: any) {
             </>
           ))}
         </List>
+        <Button
+          style={{
+            position: "fixed",
+            bottom: "40px",
+            width: drawerWidth,
+            border: "2px solid black",
+          }}
+          onClick={() => {
+            //addPageMutation.mutate(Number(projectId));
+            setOpenCreatePage(true);
+          }}
+        >
+          Add page
+        </Button>
+        <Dialog open={openCreatePage} onClose={() => setOpenCreatePage(false)}>
+          <Grid container justifyContent={"center"}>
+            <Grid item xs={12}>
+              <DialogTitle align="center">Create new Page</DialogTitle>
+            </Grid>
+            <Grid container item xs={12} justifyContent="center">
+              <TextField
+                id="outlined-basic"
+                label="Page Name"
+                variant="outlined"
+                placeholder="Enter page name"
+                style={{
+                  display: "block",
+                  marginLeft: "auto",
+                  marginRight: "auto",
+                }}
+                value={newPageName}
+                onChange={(e) => setNewPageName(e.target.value)}
+              />
+            </Grid>
+            <Button
+              onClick={() => {
+                addPageMutation.mutate();
+              }}
+              style={{ margin: "15px 10px 10px 10px" }}
+              variant={"contained"}
+            >
+              Create
+            </Button>
+          </Grid>
+        </Dialog>
       </Drawer>
       <Box
         component="main"
         sx={{
           flexGrow: 1,
           bgcolor: "rgba(93, 95, 239, 0.08)",
-          p: 5,
+          px: 3,
+          py: 3,
+          height: "100vh",
         }}
       >
-        <PlainTextExample />
+        <TextEditor
+          content={JSON.parse(project.pages[selectedPage].content)}
+          pageId={project.pages[selectedPage].id}
+        />
       </Box>
     </Box>
   );

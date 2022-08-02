@@ -4,6 +4,7 @@ import Head from "next/head";
 import { AuthProvider } from "../src/hooks/useAuth";
 import { createTheme } from "@mui/material";
 import { ThemeProvider } from "@emotion/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const theme = createTheme({
   typography: {
@@ -59,6 +60,8 @@ const theme = createTheme({
   },
 });
 
+const queryClient = new QueryClient();
+
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
@@ -71,11 +74,13 @@ function MyApp({ Component, pageProps }: AppProps) {
           href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
         />
       </Head>
-      <AuthProvider>
-        <ThemeProvider theme={theme}>
-          <Component {...pageProps} />
-        </ThemeProvider>
-      </AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <ThemeProvider theme={theme}>
+            <Component {...pageProps} />
+          </ThemeProvider>
+        </AuthProvider>
+      </QueryClientProvider>
     </>
   );
 }

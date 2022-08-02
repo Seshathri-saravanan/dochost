@@ -27,15 +27,33 @@ export const project = {
   pages: [
     {
       name: "Introduction",
-      content: "Thsfkjefv ewiufgjwe fkugwef wjgefewjhkgfv weflugwe fjlhgwef ",
+      content: JSON.stringify([
+        {
+          type: "paragraph",
+          align: "center",
+          children: [{ text: "OS Intro" }],
+        },
+      ]),
     },
     {
       name: "what is OS?",
-      content: "Thsfkjefv ewiufgjwe fkugwef wjgefewjhkgfv weflugwe fjlhgwef ",
+      content: JSON.stringify([
+        {
+          type: "paragraph",
+          align: "center",
+          children: [{ text: "What is os" }],
+        },
+      ]),
     },
     {
       name: "Types of OS",
-      content: "Thsfkjefv ewiufgjwe fkugwef wjgefewjhkgfv weflugwe fjlhgwef ",
+      content: JSON.stringify([
+        {
+          type: "paragraph",
+          align: "center",
+          children: [{ text: "Types of os" }],
+        },
+      ]),
     },
   ],
 };
