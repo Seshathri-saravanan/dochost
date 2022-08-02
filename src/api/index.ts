@@ -44,3 +44,21 @@ export async function updatePage(pageId: number, pageData: any) {
   });
   return res.data;
 }
+
+export async function createProject(project: any) {
+  const res = await axios.post(`${url}/project`, project, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem(ACCESS_TOKEN_KEY)}`,
+    },
+  });
+  return res.data;
+}
+
+export async function updateProject(pageId: number, pageData: any) {
+  const res = await axios.put(`${url}/page/${pageId}`, pageData, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem(ACCESS_TOKEN_KEY)}`,
+    },
+  });
+  return res.data;
+}

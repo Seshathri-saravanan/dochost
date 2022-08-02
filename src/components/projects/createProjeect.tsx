@@ -6,7 +6,9 @@ import {
   TextareaAutosize,
   TextField,
 } from "@mui/material";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { createProject } from "../../api";
 import styles from "../styles/Home.module.css";
 
 const CreateProject = () => {
@@ -28,6 +30,20 @@ const CreateProject = () => {
     console.log(newproject);
     setProject(newproject);
   };
+
+  const createProjectMutation = useMutation(
+    ["create-project"],
+    () => createProject(project),
+    {
+      onSuccess: () => {
+        console.log("created project");
+        setOpenCreateProject(false);
+      },
+      onError: () => {
+        setOpenCreateProject(false);
+      },
+    }
+  );
   return (
     <>
       <Button
@@ -82,9 +98,7 @@ const CreateProject = () => {
             />
           </Grid>
           <Button
-            onClick={() => {
-              setOpenCreateProject(false);
-            }}
+            onClick={() => createProjectMutation.mutate()}
             style={{ margin: "15px 10px 10px 10px" }}
             variant={"contained"}
           >

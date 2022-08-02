@@ -92,39 +92,8 @@ export default function HomeLayout({ children, title, others }: any) {
         >
           {project.name}
         </Typography>
-        <List style={{ margin: "5px" }}>
-          {project.pages.map((item: any, index: number) => (
-            <>
-              <ListItem
-                key={index}
-                style={
-                  index === selectedPage
-                    ? {
-                        backgroundColor: "#5900f2",
-                        borderRadius: "15px",
-                        padding: "5px",
-                        margin: "2px",
-                      }
-                    : { padding: "5px" }
-                }
-              >
-                <ListItemButton onClick={() => setSelectedPage(index)}>
-                  <ListItemText
-                    primary={item.name}
-                    primaryTypographyProps={{
-                      variant: "subtitle1",
-                      color: index == selectedPage ? "white" : "black",
-                    }}
-                  />
-                </ListItemButton>
-              </ListItem>
-            </>
-          ))}
-        </List>
         <Button
           style={{
-            position: "fixed",
-            bottom: "40px",
             width: drawerWidth,
             border: "2px solid black",
           }}
@@ -135,6 +104,37 @@ export default function HomeLayout({ children, title, others }: any) {
         >
           Add page
         </Button>
+        <List style={{ margin: "5px" }}>
+          {project.pages &&
+            project.pages.map((item: any, index: number) => (
+              <>
+                <ListItem
+                  key={index}
+                  style={
+                    index === selectedPage
+                      ? {
+                          backgroundColor: "#5900f2",
+                          borderRadius: "15px",
+                          padding: "5px",
+                          margin: "2px",
+                        }
+                      : { padding: "5px" }
+                  }
+                >
+                  <ListItemButton onClick={() => setSelectedPage(index)}>
+                    <ListItemText
+                      primary={item.name}
+                      primaryTypographyProps={{
+                        variant: "subtitle1",
+                        color: index == selectedPage ? "white" : "black",
+                      }}
+                    />
+                  </ListItemButton>
+                </ListItem>
+              </>
+            ))}
+        </List>
+
         <Dialog open={openCreatePage} onClose={() => setOpenCreatePage(false)}>
           <Grid container justifyContent={"center"}>
             <Grid item xs={12}>
@@ -177,10 +177,14 @@ export default function HomeLayout({ children, title, others }: any) {
           height: "100vh",
         }}
       >
-        <TextEditor
-          content={JSON.parse(project.pages[selectedPage].content)}
-          pageId={project.pages[selectedPage].id}
-        />
+        {project.pages && project.pages.length > 0 ? (
+          <TextEditor
+            content={JSON.parse(project.pages[selectedPage].content)}
+            pageId={project.pages[selectedPage].id}
+          />
+        ) : (
+          <h1>Create a page to get started!</h1>
+        )}
       </Box>
     </Box>
   );
