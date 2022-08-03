@@ -5,6 +5,7 @@ import { AuthProvider } from "../src/hooks/useAuth";
 import { createTheme } from "@mui/material";
 import { ThemeProvider } from "@emotion/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { SnackbarProvider } from "notistack";
 
 const theme = createTheme({
   typography: {
@@ -75,11 +76,13 @@ function MyApp({ Component, pageProps }: AppProps) {
         />
       </Head>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <ThemeProvider theme={theme}>
-            <Component {...pageProps} />
-          </ThemeProvider>
-        </AuthProvider>
+        <SnackbarProvider>
+          <AuthProvider>
+            <ThemeProvider theme={theme}>
+              <Component {...pageProps} />
+            </ThemeProvider>
+          </AuthProvider>
+        </SnackbarProvider>
       </QueryClientProvider>
     </>
   );

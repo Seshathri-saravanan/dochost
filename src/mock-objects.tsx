@@ -10,7 +10,7 @@ export const projects = [
     createdBy: "Seshathri",
   },
   {
-    name: "Implementation docs",
+    name: "Implementation docs ",
     description: "This is  a sample project",
     createdBy: "Seshathri",
   },
@@ -57,3 +57,21 @@ export const project = {
     },
   ],
 };
+
+export const notifications = [
+  {
+    title: "Project created",
+    description: "You created the project on 21st July 2020",
+    time: "",
+  },
+  {
+    title: "Project updated",
+    description: "You updated the project on 21st July 2020",
+    time: "",
+  },
+  {
+    title: "Page created",
+    description: "You created the project on 21st July 2020",
+    time: "",
+  },
+];

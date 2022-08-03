@@ -62,3 +62,21 @@ export async function updateProject(pageId: number, pageData: any) {
   });
   return res.data;
 }
+
+export async function updateUserProfile(userProfile: any) {
+  const res = await axios.post(`${url}/userprofile`, userProfile, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem(ACCESS_TOKEN_KEY)}`,
+    },
+  });
+  return res.data;
+}
+
+export async function getUserProfile() {
+  const res = await axios.get(`${url}/userprofile`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem(ACCESS_TOKEN_KEY)}`,
+    },
+  });
+  return res.data;
+}

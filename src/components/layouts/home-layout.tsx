@@ -19,6 +19,7 @@ import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import FolderCopyIcon from "@mui/icons-material/FolderCopy";
 import BusinessIcon from "@mui/icons-material/Business";
 import AcUnitIcon from "@mui/icons-material/AcUnit";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 const drawerWidth = 240;
 
 const navigationItems = [
@@ -37,6 +38,10 @@ const navigationItems = [
   {
     label: "Projects",
     icon: <FolderCopyIcon />,
+  },
+  {
+    label: "Notifications",
+    icon: <NotificationsIcon />,
   },
   {
     label: "Project settings",
