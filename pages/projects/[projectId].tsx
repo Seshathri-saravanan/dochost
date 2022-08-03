@@ -168,13 +168,15 @@ export default function HomeLayout({ children, title, others }: any) {
         </Dialog>
       </Drawer>
       <Box
-        component="main"
         sx={{
           flexGrow: 1,
           bgcolor: "rgba(93, 95, 239, 0.08)",
-          px: 3,
-          py: 3,
-          height: "100vh",
+          pl: 4,
+          pr: 0,
+          pt: 3,
+          m: 0,
+          minHeight: "100vh",
+          height: "100%",
         }}
       >
         {project.pages && project.pages.length > 0 ? (

@@ -31,6 +31,7 @@ import {
 import { Button as MuiButton } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { updatePage } from "../../api";
+import { useRouter } from "next/router";
 
 const HOTKEYS: { [key: string]: string } = {
   "mod+b": "bold",
@@ -46,6 +47,7 @@ const RichTextExample = ({ content, pageId }: any) => {
   console.log(content);
   const renderElement = useCallback((props: any) => <Element {...props} />, []);
   const renderLeaf = useCallback((props: any) => <Leaf {...props} />, []);
+  const router = useRouter();
 
   const [slateValue, setSlateValue] = React.useState<any>(content);
   const [editor] = useState(
@@ -61,6 +63,10 @@ const RichTextExample = ({ content, pageId }: any) => {
       onError: () => {},
     }
   );
+
+  React.useEffect(() => {
+    console.log(router);
+  }, [router]);
 
   React.useEffect(() => {
     Transforms.delete(editor, {
@@ -81,6 +87,7 @@ const RichTextExample = ({ content, pageId }: any) => {
     console.log("saving this", JSON.stringify(slateValue));
     updatePageMutation.mutate();
   };
+  const isEditable = router.query && router.query.edit == "true";
 
   return (
     <Slate
@@ -96,22 +103,24 @@ const RichTextExample = ({ content, pageId }: any) => {
         }
       }}
     >
-      <Toolbar>
-        <MarkButton format="bold" Icon={<FormatBoldIcon />} />
-        <MarkButton format="italic" Icon={<FormatItalicIcon />} />
-        <MarkButton format="underline" Icon={<FormatUnderlined />} />
-        <MarkButton format="code" Icon={<Code />} />
-        <BlockButton format="heading-one" Icon={<LooksTwo />} />
-        <BlockButton format="heading-two" Icon={<LooksOne />} />
-        <BlockButton format="block-quote" Icon={<FormatQuote />} />
-        <BlockButton format="numbered-list" Icon={<FormatListNumbered />} />
-        <BlockButton format="bulleted-list" Icon={<FormatListBulleted />} />
-        <BlockButton format="left" Icon={<FormatAlignLeft />} />
-        <BlockButton format="center" Icon={<FormatAlignCenter />} />
-        <BlockButton format="right" Icon={<FormatAlignRight />} />
-        <BlockButton format="justify" Icon={<FormatAlignJustify />} />
-        <MuiButton onClick={handleSave}>Save</MuiButton>
-      </Toolbar>
+      {isEditable && (
+        <Toolbar>
+          <MarkButton format="bold" Icon={<FormatBoldIcon />} />
+          <MarkButton format="italic" Icon={<FormatItalicIcon />} />
+          <MarkButton format="underline" Icon={<FormatUnderlined />} />
+          <MarkButton format="code" Icon={<Code />} />
+          <BlockButton format="heading-one" Icon={<LooksTwo />} />
+          <BlockButton format="heading-two" Icon={<LooksOne />} />
+          <BlockButton format="block-quote" Icon={<FormatQuote />} />
+          <BlockButton format="numbered-list" Icon={<FormatListNumbered />} />
+          <BlockButton format="bulleted-list" Icon={<FormatListBulleted />} />
+          <BlockButton format="left" Icon={<FormatAlignLeft />} />
+          <BlockButton format="center" Icon={<FormatAlignCenter />} />
+          <BlockButton format="right" Icon={<FormatAlignRight />} />
+          <BlockButton format="justify" Icon={<FormatAlignJustify />} />
+          <MuiButton onClick={handleSave}>Save</MuiButton>
+        </Toolbar>
+      )}
       <Editable
         renderElement={renderElement}
         renderLeaf={renderLeaf}
@@ -128,10 +137,11 @@ const RichTextExample = ({ content, pageId }: any) => {
           }
         }}
         style={{
-          overflowY: "scroll",
-          height: "90%",
+          height: "100%",
           margin: "0px",
+          width: "100%",
         }}
+        readOnly={!isEditable}
       />
     </Slate>
   );
