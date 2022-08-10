@@ -11,15 +11,8 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
 import { useRouter } from "next/router";
-import SettingsIcon from "@mui/icons-material/Settings";
-import AccountBoxIcon from "@mui/icons-material/AccountBox";
-import FolderCopyIcon from "@mui/icons-material/FolderCopy";
-import BusinessIcon from "@mui/icons-material/Business";
-import AcUnitIcon from "@mui/icons-material/AcUnit";
-import { project } from "../../src/mock-objects";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import TextEditor from "../../src/components/editor/rich-editor";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createPage, getProjectDetails } from "../../src/api";
@@ -31,13 +24,14 @@ import {
   Modal,
   TextField,
 } from "@mui/material";
-const drawerWidth = 240;
+const drawerWidth = 280;
 
 export default function HomeLayout({ children, title, others }: any) {
   const [selectedPage, setSelectedPage] = React.useState(0);
   const [openCreatePage, setOpenCreatePage] = React.useState(false);
   const [newPageName, setNewPageName] = React.useState<string>("");
   const router = useRouter();
+  const isEditable = router.query && router.query.edit == "true";
   const { projectId } = router.query;
   const projectDetailsQuery = useQuery(
     ["get-project-details", projectId],
@@ -56,6 +50,7 @@ export default function HomeLayout({ children, title, others }: any) {
       onSuccess: () => {
         console.log("added page");
         projectDetailsQuery.refetch();
+        setOpenCreatePage(false);
       },
       onError: () => {},
     }
@@ -92,18 +87,20 @@ export default function HomeLayout({ children, title, others }: any) {
         >
           {project.name}
         </Typography>
-        <Button
-          style={{
-            width: drawerWidth,
-            border: "2px solid black",
-          }}
-          onClick={() => {
-            //addPageMutation.mutate(Number(projectId));
-            setOpenCreatePage(true);
-          }}
-        >
-          Add page
-        </Button>
+        {isEditable && (
+          <Button
+            style={{
+              width: drawerWidth,
+            }}
+            onClick={() => {
+              //addPageMutation.mutate(Number(projectId));
+              setOpenCreatePage(true);
+            }}
+          >
+            <AddCircleOutlineIcon />
+            &nbsp;Add page
+          </Button>
+        )}
         <List style={{ margin: "5px" }}>
           {project.pages &&
             project.pages.map((item: any, index: number) => (
@@ -127,6 +124,7 @@ export default function HomeLayout({ children, title, others }: any) {
                       primaryTypographyProps={{
                         variant: "subtitle1",
                         color: index == selectedPage ? "white" : "black",
+                        textAlign: "center",
                       }}
                     />
                   </ListItemButton>

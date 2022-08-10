@@ -20,7 +20,7 @@ import FolderCopyIcon from "@mui/icons-material/FolderCopy";
 import BusinessIcon from "@mui/icons-material/Business";
 import AcUnitIcon from "@mui/icons-material/AcUnit";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-const drawerWidth = 240;
+const drawerWidth = 270;
 
 const navigationItems = [
   {
@@ -62,6 +62,7 @@ export default function HomeLayout({ children, title, others }: any) {
             width: drawerWidth,
             boxSizing: "border-box",
             backgroundColor: "rgba(93, 95, 239, 0.125)",
+            backgroundImage: `linear-gradient(to bottom right,rgba(93, 95, 239, 0.125),rgba(93, 95, 239, 0.5))`,
           },
         }}
         variant="permanent"
@@ -120,6 +121,7 @@ export default function HomeLayout({ children, title, others }: any) {
           flexGrow: 1,
           bgcolor: "rgba(93, 95, 239, 0.08)",
           p: 5,
+          backgroundImage: `linear-gradient(to bottom right,rgba(93, 200, 200, 0.2),rgba(0, 95, 239, 0.5),#5D5FEF)`,
         }}
       >
         {children}

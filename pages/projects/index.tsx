@@ -22,6 +22,7 @@ import { getAllProjects } from "../../src/api";
 import Link from "next/link";
 import CreateProject from "../../src/components/projects/createProjeect";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import EditProject from "../../src/components/projects/editProject";
 
 const ProjectCard = ({ project }: any) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -33,12 +34,21 @@ const ProjectCard = ({ project }: any) => {
     setAnchorEl(null);
   };
 
+  const getrandomcolor = () => {
+    const r = Math.floor(50 + Math.random() * 120);
+    const g = Math.floor(0);
+    const b = Math.floor(255);
+    return `rgb(${r},${g},${b})`;
+  };
+
   return (
     <Box sx={{ p: 1 }}>
       <Card
         variant="outlined"
         style={{
-          backgroundColor: "#5D5FEF",
+          backgroundColor:
+            "rgba(93, 95, 239, 0.08)" /* For browsers that do not support gradients */,
+          backgroundImage: `linear-gradient(#5D5FEF,#5D5FEF,#5D5FEF, ${getrandomcolor()})`,
           borderRadius: "10px",
         }}
       >
@@ -91,13 +101,16 @@ const ProjectCard = ({ project }: any) => {
               "aria-labelledby": "basic-button",
             }}
           >
-            <MenuItem onClick={handleClose}>Edit</MenuItem>
+            <MenuItem>
+              <Link href={`/projects/${project.id}?edit=true`}>Edit</Link>
+            </MenuItem>
             <MenuItem>
               <Link href={`/projects/${project.id}`}>View</Link>
             </MenuItem>
             <MenuItem onClick={handleClose}>Settings</MenuItem>
           </Menu>
         </CardActions>
+        <EditProject projectprops={project} />
       </Card>
     </Box>
   );
