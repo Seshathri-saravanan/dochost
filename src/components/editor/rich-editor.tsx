@@ -138,8 +138,9 @@ const RichTextExample = ({ content, pageId }: any) => {
         }}
         style={{
           height: "100%",
-          margin: "0px",
+          marginTop: !isEditable ? "-40px" : "-20px",
           width: "100%",
+          paddingBottom: "200px",
         }}
         readOnly={!isEditable}
       />

@@ -66,7 +66,7 @@ export default function HomeLayout({ children, title, others }: any) {
   if (!projectDetailsQuery.data) return <h1>No data</h1>;
   const project = projectDetailsQuery.data;
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex", overflowX: "hidden" }}>
       <CssBaseline />
       <Drawer
         sx={{
@@ -83,14 +83,14 @@ export default function HomeLayout({ children, title, others }: any) {
       >
         <Typography
           variant="h3"
-          style={{ padding: "10px", margin: "2px", textAlign: "center" }}
+          style={{ padding: "10px", marginTop: "2px", textAlign: "center" }}
         >
           {project.name}
         </Typography>
         {isEditable && (
           <Button
             style={{
-              width: drawerWidth,
+              width: drawerWidth - 5,
             }}
             onClick={() => {
               //addPageMutation.mutate(Number(projectId));
