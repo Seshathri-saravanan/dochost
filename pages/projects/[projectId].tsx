@@ -24,21 +24,26 @@ import {
   Modal,
   TextField,
 } from "@mui/material";
+import { ReactSortable } from "react-sortablejs";
 const drawerWidth = 280;
 
 export default function HomeLayout({ children, title, others }: any) {
-  const [selectedPage, setSelectedPage] = React.useState(0);
+  const [selectedPage, setSelectedPage] = React.useState<any>(null);
   const [openCreatePage, setOpenCreatePage] = React.useState(false);
   const [newPageName, setNewPageName] = React.useState<string>("");
+  const [pages, setPages] = React.useState<any[]>([]);
   const router = useRouter();
   const isEditable = router.query && router.query.edit == "true";
   const { projectId } = router.query;
+
   const projectDetailsQuery = useQuery(
     ["get-project-details", projectId],
     () => getProjectDetails(Number(projectId)),
     {
       onSuccess: (data) => {
-        console.log("this is data", data);
+        setPages(data.pages);
+        setSelectedPage(data.pages[0]);
+        console.log("this is pages", data.pages);
       },
       enabled: false,
     }
@@ -102,13 +107,13 @@ export default function HomeLayout({ children, title, others }: any) {
           </Button>
         )}
         <List style={{ margin: "5px" }}>
-          {project.pages &&
-            project.pages.map((item: any, index: number) => (
+          <ReactSortable list={pages} setList={setPages}>
+            {pages.map((item: any, index: number) => (
               <>
                 <ListItem
                   key={index}
                   style={
-                    index === selectedPage
+                    item.id === selectedPage?.id
                       ? {
                           backgroundColor: "#5900f2",
                           borderRadius: "15px",
@@ -118,12 +123,12 @@ export default function HomeLayout({ children, title, others }: any) {
                       : { padding: "5px" }
                   }
                 >
-                  <ListItemButton onClick={() => setSelectedPage(index)}>
+                  <ListItemButton onClick={() => setSelectedPage(item)}>
                     <ListItemText
                       primary={item.name}
                       primaryTypographyProps={{
                         variant: "subtitle1",
-                        color: index == selectedPage ? "white" : "black",
+                        color: item.id === selectedPage?.id ? "white" : "black",
                         textAlign: "center",
                       }}
                     />
@@ -131,6 +136,7 @@ export default function HomeLayout({ children, title, others }: any) {
                 </ListItem>
               </>
             ))}
+          </ReactSortable>
         </List>
 
         <Dialog open={openCreatePage} onClose={() => setOpenCreatePage(false)}>
@@ -177,10 +183,10 @@ export default function HomeLayout({ children, title, others }: any) {
           height: "100%",
         }}
       >
-        {project.pages && project.pages.length > 0 ? (
+        {selectedPage ? (
           <TextEditor
-            content={JSON.parse(project.pages[selectedPage].content)}
-            pageId={project.pages[selectedPage].id}
+            content={JSON.parse(selectedPage.content)}
+            pageId={selectedPage.id}
           />
         ) : (
           <h1>Create a page to get started!</h1>

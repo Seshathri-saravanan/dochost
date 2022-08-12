@@ -20,9 +20,11 @@
     "notistack": "^2.0.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-sortablejs": "^6.1.4",
     "slate": "^0.81.1",
     "slate-history": "^0.66.0",
-    "slate-react": "^0.81.0"
+    "slate-react": "^0.81.0",
+    "sortablejs": "^1.15.0"
   },
   "devDependencies": {
     "@types/node": "18.0.0",
