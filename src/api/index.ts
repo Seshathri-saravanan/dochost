@@ -11,6 +11,15 @@ export async function getAllProjects() {
   return res.data;
 }
 
+export async function getSharedProjects() {
+  const res = await axios.get(`${url}/project/shared`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem(ACCESS_TOKEN_KEY)}`,
+    },
+  });
+  return res.data;
+}
+
 export async function getProjectDetails(projectId: number) {
   const res = await axios.get(`${url}/project/${projectId}`, {
     headers: {

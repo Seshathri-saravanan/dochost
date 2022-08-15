@@ -2,8 +2,7 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import CssBaseline from "@mui/material/CssBaseline";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
+import LogoutIcon from "@mui/icons-material/Logout";
 import List from "@mui/material/List";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
@@ -20,6 +19,7 @@ import FolderCopyIcon from "@mui/icons-material/FolderCopy";
 import BusinessIcon from "@mui/icons-material/Business";
 import AcUnitIcon from "@mui/icons-material/AcUnit";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import { useAuth } from "../../hooks/useAuth";
 const drawerWidth = 270;
 
 const navigationItems = [
@@ -47,10 +47,15 @@ const navigationItems = [
     label: "Project settings",
     icon: <SettingsIcon />,
   },
+  {
+    label: "Logout",
+    icon: <LogoutIcon />,
+  },
 ];
 
 export default function HomeLayout({ children, title, others }: any) {
   const router = useRouter();
+  const auth: any = useAuth();
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -91,7 +96,11 @@ export default function HomeLayout({ children, title, others }: any) {
                 }
               >
                 <ListItemButton
-                  onClick={() => router.push(`/${item.label.toLowerCase()}`)}
+                  onClick={() => {
+                    if (item.label.toLocaleLowerCase() === "logout")
+                      auth.logout();
+                    else router.push(`/${item.label.toLowerCase()}`);
+                  }}
                 >
                   <ListItemIcon
                     style={

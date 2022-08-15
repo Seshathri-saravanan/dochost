@@ -18,7 +18,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import { getAllProjects } from "../../src/api";
+import { getAllProjects, getSharedProjects } from "../../src/api";
 import Link from "next/link";
 import CreateProject from "../../src/components/projects/createProjeect";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
@@ -125,7 +125,24 @@ const Home: NextPage = () => {
       console.log("error-projects", e);
     },
   });
+
+  const sharedProjectsQuery = useQuery(
+    ["get-shared-projects"],
+    getSharedProjects,
+    {
+      onSuccess: (data) => {
+        console.log("data-projects", data);
+      },
+      onError: (e) => {
+        console.log("error-projects", e);
+      },
+    }
+  );
+
   if (projectsQuery && projectsQuery.isLoading) {
+    return <div>Loading the projects</div>;
+  }
+  if (sharedProjectsQuery && sharedProjectsQuery.isLoading) {
     return <div>Loading the projects</div>;
   }
 
@@ -164,7 +181,7 @@ const Home: NextPage = () => {
           alignItems={"stretch"}
           style={{ margin: "5px" }}
         >
-          {[...projects, ...projects, ...projects].map((project, ind) => (
+          {sharedProjectsQuery.data?.map((project: any, ind: number) => (
             <Grid container item xs={3} direction="row" alignItems={"stretch"}>
               <ProjectCard project={project} />
             </Grid>
