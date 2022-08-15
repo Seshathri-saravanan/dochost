@@ -9,11 +9,15 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { createProject } from "../../api";
-import styles from "../styles/Home.module.css";
+import { useStyles } from "./formstyles";
+import AccessInput from "./settings/accessInput";
 
 const EditProject = ({ projectprops }: any) => {
+  const classes = useStyles();
   const [openCreateProject, setOpenCreateProject] = useState(false);
   const [project, setProject] = useState<any>(projectprops);
+  const [visibility, setVisibility] = useState<string>("NONE");
+  const [userEmailList, setUserEmailList] = useState<any>({});
   const handleChangeProject = (e: any) => {
     let newproject = { ...project };
     console.log(e.target.name, e.target.value);
@@ -57,7 +61,7 @@ const EditProject = ({ projectprops }: any) => {
         open={openCreateProject}
         onClose={() => setOpenCreateProject(false)}
       >
-        <Grid container justifyContent={"center"}>
+        <Grid container justifyContent={"center"} alignItems={"center"}>
           <Grid item xs={12}>
             <DialogTitle align="center">Edit Project</DialogTitle>
           </Grid>
@@ -68,15 +72,9 @@ const EditProject = ({ projectprops }: any) => {
               variant="outlined"
               name="name"
               placeholder="Enter project name"
-              style={{
-                display: "block",
-                marginLeft: "auto",
-                marginRight: "auto",
-                marginTop: "15px",
-                width: "300px",
-              }}
-              value={project.name}
               onChange={handleChangeProject}
+              className={classes.input}
+              value={project.name}
               fullWidth
             />
           </Grid>
@@ -86,24 +84,26 @@ const EditProject = ({ projectprops }: any) => {
               name="description"
               minRows={5}
               placeholder="Enter project description"
-              style={{
-                display: "block",
-                marginLeft: "auto",
-                marginRight: "auto",
-                marginTop: "15px",
-                width: "300px",
-              }}
+              className={classes.input}
               value={project.description}
               onChange={handleChangeProject}
             />
           </Grid>
-          <Button
-            onClick={() => createProjectMutation.mutate()}
-            style={{ margin: "15px 10px 10px 10px" }}
-            variant={"contained"}
-          >
-            Edit
-          </Button>
+          <AccessInput
+            visibility={visibility}
+            userEmailList={userEmailList}
+            setVisibility={setVisibility}
+            setUserEmailList={setUserEmailList}
+          />
+          <Grid container item xs={12} justifyContent={"center"}>
+            <Button
+              onClick={() => createProjectMutation.mutate()}
+              style={{ margin: "15px 10px 10px 10px" }}
+              variant={"contained"}
+            >
+              Save
+            </Button>
+          </Grid>
         </Grid>
       </Dialog>
     </>

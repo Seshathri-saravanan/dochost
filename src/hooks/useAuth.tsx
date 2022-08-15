@@ -36,6 +36,16 @@ export const AuthProvider = (props: any) => {
     handleChangeUser();
   };
 
+  const signup = async (name: string, email: string, password: string) => {
+    const res = await axios.post("http://localhost:3001/sign-up", {
+      email,
+      password,
+      name,
+    });
+    localStorage.setItem(ACCESS_TOKEN_KEY, res.data.access_token);
+    handleChangeUser();
+  };
+
   React.useEffect(() => {
     try {
       setLoading(true);
@@ -54,6 +64,9 @@ export const AuthProvider = (props: any) => {
     if (user && !loading && router.pathname == "/login") router.push("/");
   }, [user, loading]);
   return (
-    <AuthContext.Provider value={{ user, logout, login, loading }} {...props} />
+    <AuthContext.Provider
+      value={{ user, logout, login, loading, signup }}
+      {...props}
+    />
   );
 };

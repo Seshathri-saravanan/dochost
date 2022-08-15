@@ -27,6 +27,15 @@ import {
 import { ReactSortable } from "react-sortablejs";
 const drawerWidth = 280;
 
+const DraggableList = ({ isEditable, pages, setPages, pageList }: any) =>
+  isEditable && pages.length > 0 ? (
+    <ReactSortable list={pages} setList={setPages}>
+      {pageList}
+    </ReactSortable>
+  ) : (
+    pageList
+  );
+
 export default function HomeLayout({ children, title, others }: any) {
   const [selectedPage, setSelectedPage] = React.useState<any>(null);
   const [openCreatePage, setOpenCreatePage] = React.useState(false);
@@ -107,8 +116,8 @@ export default function HomeLayout({ children, title, others }: any) {
           </Button>
         )}
         <List style={{ margin: "5px" }}>
-          <ReactSortable list={pages} setList={setPages}>
-            {pages.map((item: any, index: number) => (
+          <DraggableList
+            pageList={pages.map((item: any, index: number) => (
               <>
                 <ListItem
                   key={index}
@@ -136,7 +145,10 @@ export default function HomeLayout({ children, title, others }: any) {
                 </ListItem>
               </>
             ))}
-          </ReactSortable>
+            pages={pages}
+            setPages={setPages}
+            isEditable={isEditable}
+          />
         </List>
 
         <Dialog open={openCreatePage} onClose={() => setOpenCreatePage(false)}>

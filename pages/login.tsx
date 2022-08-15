@@ -13,6 +13,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useAuth } from "../src/hooks/useAuth";
+import { useRouter } from "next/router";
 
 function Copyright(props: any) {
   return (
@@ -34,13 +35,19 @@ function Copyright(props: any) {
 
 export default function SignIn() {
   const auth: any = useAuth();
+  const router = useRouter();
+  const signup = router && router.query.signup;
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const email = data.get("email");
     const password = data.get("password");
-    auth.login(email, password);
+    if (signup) {
+      const name = data.get("name");
+      auth.signup(name, email, password);
+    } else auth.login(email, password);
   };
+
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -56,9 +63,20 @@ export default function SignIn() {
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Sign in
+          {!signup ? "Log in" : "Sign up"}
         </Typography>
         <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          {signup && (
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="name"
+              label="name"
+              name="name"
+              autoFocus
+            />
+          )}
           <TextField
             margin="normal"
             required
@@ -89,17 +107,26 @@ export default function SignIn() {
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
           >
-            Sign In
+            {signup ? "Sign Up" : "Log In"}
           </Button>
           <Grid container>
-            <Grid item xs>
-              <Link href="#" variant="body2">
-                Forgot password?
-              </Link>
-            </Grid>
+            {!signup && (
+              <Grid item xs>
+                <Link href="#" variant="body2">
+                  Forgot password?
+                </Link>
+              </Grid>
+            )}
             <Grid item>
-              <Link href="#" variant="body2">
-                {"Don't have an account? Sign Up"}
+              <Link
+                variant="body2"
+                onClick={() =>
+                  router.push(signup ? "/login" : "/login?signup=true")
+                }
+              >
+                {signup
+                  ? "Already have an account?Log In"
+                  : "Don't have an account? Sign Up"}
               </Link>
             </Grid>
           </Grid>
