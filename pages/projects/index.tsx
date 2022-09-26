@@ -17,16 +17,24 @@ import {
   MenuItem,
   Typography,
 } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
-import { getAllProjects, getSharedProjects } from "../../src/api";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  deleteProject,
+  getAllProjects,
+  getSharedProjects,
+} from "../../src/api";
 import Link from "next/link";
 import CreateProject from "../../src/components/projects/createProjeect";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import EditProject from "../../src/components/projects/editProject";
+import { useSnackbar } from "notistack";
+import { useAuth } from "../../src/hooks/useAuth";
 
-const ProjectCard = ({ project }: any) => {
+const ProjectCard = ({ project, refetchProjects }: any) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const { enqueueSnackbar } = useSnackbar();
+  const auth: any = useAuth();
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -41,6 +49,20 @@ const ProjectCard = ({ project }: any) => {
     return `rgb(${r},${g},${b})`;
   };
 
+  const deleteProjectMutation = useMutation(
+    ["delete-project"],
+    () => deleteProject(project.id),
+    {
+      onError: () => {
+        console.log("error deleting");
+      },
+      onSuccess: (data) => {
+        console.log("sucessfully deleted", data);
+        enqueueSnackbar("Successfully deleted!");
+        refetchProjects();
+      },
+    }
+  );
   return (
     <Box sx={{ p: 1 }}>
       <Card
@@ -107,6 +129,11 @@ const ProjectCard = ({ project }: any) => {
             <MenuItem>
               <Link href={`/projects/${project.id}`}>View</Link>
             </MenuItem>
+            {project.createdBy == auth.user.id && (
+              <MenuItem onClick={() => deleteProjectMutation.mutate()}>
+                Delete
+              </MenuItem>
+            )}
             <MenuItem onClick={handleClose}>Settings</MenuItem>
           </Menu>
         </CardActions>
@@ -166,7 +193,10 @@ const Home: NextPage = () => {
         >
           {projectsQuery.data.map((project: any, ind: number) => (
             <Grid item xs={3}>
-              <ProjectCard project={project} />
+              <ProjectCard
+                project={project}
+                refetchProjects={() => projectsQuery.refetch()}
+              />
             </Grid>
           ))}
         </Grid>

@@ -98,3 +98,12 @@ export async function getUserProfile() {
   });
   return res.data;
 }
+
+export async function deleteProject(id: number) {
+  const res = await axios.delete(`${url}/project/${id}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem(ACCESS_TOKEN_KEY)}`,
+    },
+  });
+  return res.data;
+}
